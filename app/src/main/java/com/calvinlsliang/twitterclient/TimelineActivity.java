@@ -1,4 +1,4 @@
-package com.codepath.apps.twitterclient;
+package com.calvinlsliang.twitterclient;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,8 +8,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
-import com.codepath.apps.twitterclient.models.Tweet;
-import com.codepath.apps.twitterclient.models.User;
+import com.calvinlsliang.twitterclient.models.User;
+import com.calvinlsliang.twitterclient.models.Tweet;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.apache.http.Header;
@@ -24,12 +24,9 @@ public class TimelineActivity extends AppCompatActivity {
     private TweetsArrayAdapter aTweets;
     private ArrayList<Tweet> tweets;
     private ListView lvTweets;
-
     private User currentUser = null;
-
     private long since = 0;
     private long offset = 25;
-
     private final int REQUEST_CODE = 20;
     private final int RESULT_OK = 200;
 
@@ -39,24 +36,17 @@ public class TimelineActivity extends AppCompatActivity {
         setContentView(R.layout.activity_timeline);
 
         lvTweets = (ListView) findViewById(R.id.lvTweets);
-
         tweets = new ArrayList<>();
-
         aTweets = new TweetsArrayAdapter(this, tweets);
-
         lvTweets.setAdapter(aTweets);
-
         client = TwitterApplication.getRestClient();
 
-
         populateProfile();
-
         populateTimeline();
 
         lvTweets.setOnScrollListener(new EndlessScrollListener() {
             @Override
             public boolean onLoadMore(int page, int totalItemsCount) {
-//                aTweets.clear();
                 populateTimeline();
                 aTweets.notifyDataSetChanged();
                 return true;
@@ -67,14 +57,12 @@ public class TimelineActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        return super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu_timeline, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case R.id.menuSettings:
                 composeMessage();

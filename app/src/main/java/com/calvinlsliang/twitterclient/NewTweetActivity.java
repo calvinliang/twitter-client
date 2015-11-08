@@ -1,4 +1,4 @@
-package com.codepath.apps.twitterclient;
+package com.calvinlsliang.twitterclient;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,7 +11,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.codepath.apps.twitterclient.models.User;
+import com.calvinlsliang.twitterclient.models.User;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
 
@@ -94,5 +94,4 @@ public class NewTweetActivity extends AppCompatActivity {
         setResult(RESULT_OK, i);
         finish();
     }
-
 }

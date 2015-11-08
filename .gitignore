@@ -63,6 +63,3 @@ local.properties
 .idea
 build
 import-summary.txt
-
-# Consumer ID / Secret Key
-app/src/main/secret.txt

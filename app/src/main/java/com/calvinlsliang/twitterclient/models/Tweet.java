@@ -1,4 +1,4 @@
-package com.codepath.apps.twitterclient.models;
+package com.calvinlsliang.twitterclient.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

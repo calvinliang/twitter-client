@@ -1,4 +1,4 @@
-package com.codepath.apps.twitterclient;
+package com.calvinlsliang.twitterclient;
 
 import android.content.Context;
 
