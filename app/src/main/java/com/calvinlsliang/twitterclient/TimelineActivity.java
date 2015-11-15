@@ -2,57 +2,49 @@ package com.calvinlsliang.twitterclient;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListView;
 
+import com.calvinlsliang.twitterclient.fragments.HomeTimelineFragment;
+import com.calvinlsliang.twitterclient.fragments.MentionsTimelineFragment;
 import com.calvinlsliang.twitterclient.models.User;
-import com.calvinlsliang.twitterclient.models.Tweet;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.apache.http.Header;
-import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 public class TimelineActivity extends AppCompatActivity {
 
     private TwitterClient client;
-    private TweetsArrayAdapter aTweets;
-    private ArrayList<Tweet> tweets;
-    private ListView lvTweets;
     private User currentUser = null;
-    private long since = 0;
-    private long offset = 25;
+
+//    private HomeTimelineFragment homeTimelineFragment;
+
+
     private final int REQUEST_CODE = 20;
     private final int RESULT_OK = 200;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
-
-        lvTweets = (ListView) findViewById(R.id.lvTweets);
-        tweets = new ArrayList<>();
-        aTweets = new TweetsArrayAdapter(this, tweets);
-        lvTweets.setAdapter(aTweets);
         client = TwitterApplication.getRestClient();
-
         populateProfile();
-        populateTimeline();
 
-        lvTweets.setOnScrollListener(new EndlessScrollListener() {
-            @Override
-            public boolean onLoadMore(int page, int totalItemsCount) {
-                populateTimeline();
-                aTweets.notifyDataSetChanged();
-                return true;
-            }
-        });
+//        homeTimelineFragment = (HomeTimelineFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_timeline);
 
+
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setAdapter(new TweetsPagerAdapter(getSupportFragmentManager()));
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     @Override
@@ -67,29 +59,16 @@ public class TimelineActivity extends AppCompatActivity {
             case R.id.menuSettings:
                 composeMessage();
                 return true;
-
+            case R.id.menuProfile:
+                showProfile();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
 
         }
     }
 
-    private void composeMessage() {
-        Intent i = new Intent(TimelineActivity.this, NewTweetActivity.class);
-        i.putExtra("currentUser", currentUser);
-        startActivityForResult(i, REQUEST_CODE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
-            since = 0;
-            aTweets.clear();
-            populateTimeline();
-        }
-    }
-
-    private void populateProfile() {
+    public void populateProfile() {
         client.getProfile(new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -103,30 +82,53 @@ public class TimelineActivity extends AppCompatActivity {
         });
     }
 
-    private void populateTimeline() {
-        client.getHomeTimeline(since, offset, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                ArrayList<Tweet> alTweets = Tweet.fromJSONArray(response);
-                aTweets.addAll(alTweets);
-                since = getMin(alTweets);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.d("DEBUG", errorResponse.toString());
-            }
-        });
+    private void composeMessage() {
+        Intent i = new Intent(TimelineActivity.this, NewTweetActivity.class);
+        i.putExtra("currentUser", currentUser);
+        startActivityForResult(i, REQUEST_CODE);
     }
 
-    private long getMin(ArrayList<Tweet> tweets) {
-        long min = Long.MAX_VALUE;
+    private void showProfile() {
+        Intent i = new Intent(TimelineActivity.this, ProfileActivity.class);
+        i.putExtra("currentUser", currentUser);
+        startActivityForResult(i, REQUEST_CODE);
+    }
 
-        for (int i = 0; i < tweets.size(); i++) {
-            if (min > tweets.get(i).getUid()) {
-                min = tweets.get(i).getUid();
-            }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+
+//            homeTimelineFragment.restart();
         }
-        return min;
     }
+
+    // Returns the order of the fragments in the view pager
+    public class TweetsPagerAdapter extends FragmentPagerAdapter {
+        private String tabTitles[] = new String[] {"Home", "Mentions"};
+
+        public TweetsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return tabTitles[position];
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            if (position == 0) {
+                return new HomeTimelineFragment();
+            } else if (position == 1) {
+                return new MentionsTimelineFragment();
+            }
+            return null;
+        }
+
+        @Override
+        public int getCount() {
+            return tabTitles.length;
+        }
+    }
+
 }
