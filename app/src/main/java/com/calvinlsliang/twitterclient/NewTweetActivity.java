@@ -54,9 +54,9 @@ public class NewTweetActivity extends AppCompatActivity {
     private void initializeViews() {
         currentUser = getIntent().getParcelableExtra("currentUser");
 
-        ImageView ivNewProfile = (ImageView) findViewById(R.id.ivNewProfile);
+        ImageView ivNewProfile = (ImageView) findViewById(R.id.ivUserProfile);
         TextView tvNewUsername = (TextView) findViewById(R.id.tvNewUsername);
-        TextView tvNewName = (TextView) findViewById(R.id.tvNewName);
+        TextView tvNewName = (TextView) findViewById(R.id.tvUserName);
 
         Picasso.with(this).load(currentUser.getProfileImageUrl()).into(ivNewProfile);
         tvNewUsername.setText(currentUser.getScreenName());

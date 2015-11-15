@@ -1,6 +1,7 @@
 package com.calvinlsliang.twitterclient;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,9 @@ import java.util.List;
  * Created by cliang on 11/7/15.
  */
 public class TweetsArrayAdapter extends ArrayAdapter<Tweet> {
+    private Tweet tweet;
+    private String screenname;
+
     public TweetsArrayAdapter(Context context, List<Tweet> tweets) {
         super(context, 0, tweets);
     }
@@ -31,7 +35,7 @@ public class TweetsArrayAdapter extends ArrayAdapter<Tweet> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Tweet tweet = getItem(position);
+        tweet = getItem(position);
         ViewHolder viewHolder = null;
 
         if (convertView == null) {
@@ -49,7 +53,8 @@ public class TweetsArrayAdapter extends ArrayAdapter<Tweet> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.tvUsername.setText(tweet.getUser().getScreenName());
+        screenname = tweet.getUser().getScreenName();
+        viewHolder.tvUsername.setText(screenname);
         viewHolder.tvName.setText(tweet.getUser().getName());
         viewHolder.tvBody.setText(tweet.getBody());
         viewHolder.tvRelativeTime.setText(tweet.getCreatedAt());
@@ -57,7 +62,15 @@ public class TweetsArrayAdapter extends ArrayAdapter<Tweet> {
 
         Picasso.with(getContext()).load(tweet.getUser().getProfileImageUrl()).into(viewHolder.ivProfile);
 
-        return convertView;
+        viewHolder.ivProfile.setOnClickListener(new View.OnClickListener() {
+            String name = screenname;
 
+            public void onClick(View v) {
+                Intent i = new Intent(v.getContext(), ProfileActivity.class);
+                i.putExtra("screenname", name);
+                v.getContext().startActivity(i);
+            }
+        });
+        return convertView;
     }
 }
