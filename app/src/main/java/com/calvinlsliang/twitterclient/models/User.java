@@ -10,6 +10,15 @@ import org.json.JSONObject;
  * Created by cliang on 11/7/15.
  */
 public class User implements Parcelable {
+
+    private String name;
+    private long uid;
+    private String screenName;
+    private String profileImageUrl;
+    private String description;
+    private int followers;
+    private int following;
+
     public String getName() {
         return name;
     }
@@ -26,10 +35,17 @@ public class User implements Parcelable {
         return profileImageUrl;
     }
 
-    private String name;
-    private long uid;
-    private String screenName;
-    private String profileImageUrl;
+    public int getFollowers() {
+        return followers;
+    }
+
+    public int getFollowing() {
+        return following;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 
     public static User fromJSON(JSONObject jsonObject) {
         User u = new User();
@@ -39,12 +55,19 @@ public class User implements Parcelable {
             u.uid = jsonObject.getLong("id");
             u.screenName = "@" + jsonObject.getString("screen_name");
             u.profileImageUrl = jsonObject.getString("profile_image_url");
+            u.description = jsonObject.getString("description");
+            u.followers = jsonObject.getInt("followers_count");
+            u.following = jsonObject.getInt("friends_count");
+
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         return u;
+    }
+
+    public User() {
     }
 
     @Override
@@ -58,9 +81,9 @@ public class User implements Parcelable {
         dest.writeLong(this.uid);
         dest.writeString(this.screenName);
         dest.writeString(this.profileImageUrl);
-    }
-
-    public User() {
+        dest.writeString(this.description);
+        dest.writeInt(this.followers);
+        dest.writeInt(this.following);
     }
 
     protected User(Parcel in) {
@@ -68,9 +91,12 @@ public class User implements Parcelable {
         this.uid = in.readLong();
         this.screenName = in.readString();
         this.profileImageUrl = in.readString();
+        this.description = in.readString();
+        this.followers = in.readInt();
+        this.following = in.readInt();
     }
 
-    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
+    public static final Creator<User> CREATOR = new Creator<User>() {
         public User createFromParcel(Parcel source) {
             return new User(source);
         }

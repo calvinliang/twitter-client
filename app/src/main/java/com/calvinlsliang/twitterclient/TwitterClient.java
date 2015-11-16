@@ -26,8 +26,8 @@ public class TwitterClient extends OAuthBaseClient {
 	public static final String REST_URL = "https://api.twitter.com/1.1";
 	public static final String REST_CALLBACK_URL = "oauth://cltwitterclient";
 
-	public static final String REST_CONSUMER_KEY = "INSERT_CONSUMER_KEY";       // Change this
-	public static final String REST_CONSUMER_SECRET = "INSERT_CONSUMER_SECRET"; // Change this
+	public static final String REST_CONSUMER_KEY = "REPLACE";       // Change this
+	public static final String REST_CONSUMER_SECRET = "REPLACE"; // Change this
 
 	public TwitterClient(Context context) {
 		super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
@@ -45,7 +45,20 @@ public class TwitterClient extends OAuthBaseClient {
 		client.get(apiUrl, params, handler);
 	}
 
-	public void getProfile(AsyncHttpResponseHandler handler) {
+    public void getMentionsTimeline(long since, long offset, AsyncHttpResponseHandler handler) {
+        String apiUrl = getApiUrl("statuses/mentions_timeline.json");
+        RequestParams params = new RequestParams();
+        params.put("count", offset);
+
+        if (since != 0) {
+            params.put("max_id", since);
+        }
+
+        client.get(apiUrl, params, handler);
+    }
+
+
+    public void getProfile(AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("account/verify_credentials.json");
 		RequestParams params = new RequestParams();
 		client.get(apiUrl, params, handler);
@@ -61,4 +74,19 @@ public class TwitterClient extends OAuthBaseClient {
 
 		client.post(apiUrl, params, handler);
 	}
+
+	public void getProfileTimeline(String screenname, AsyncHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("statuses/user_timeline.json");
+		RequestParams params = new RequestParams();
+
+		// If username is null, grab authenticated user's profile, otherwise return
+		// the specific user wanted
+
+		if (screenname != null) {
+			params.put("screen_name", screenname);
+		}
+
+		client.get(apiUrl, params, handler);
+	}
+
 }
